@@ -9,7 +9,7 @@ export default function Sidebar({ children }) {
       right={0}
       bg="blue.100"
       w="20vw"
-      h="100vh"
+      h="auto"
     >
       <SidebarItem itemName={"Home"} to={"/"} />
       <SidebarItem itemName={"Ban List"} to={"/banlist"} />
