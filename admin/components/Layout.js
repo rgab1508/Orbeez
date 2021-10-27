@@ -8,7 +8,7 @@ export default function Layout({ children }) {
       <Navbar />
       <Flex direction="row" w="100%">
         <Sidebar />
-        <Flex direction="column" w="100%">
+        <Flex h="100vh" overflowY="scroll" direction="column" w="100%">
           {children}
         </Flex>
       </Flex>
