@@ -102,7 +102,7 @@ export default function BanList() {
             <Input
               placeholder="Level"
               name="level"
-              value={value.level}
+              value={values.level}
               onChange={handleOnChange}
             />
             <Button colorScheme="blue" onClick={handleAdd}>
