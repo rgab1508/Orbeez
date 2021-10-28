@@ -97,8 +97,14 @@ export default function BanList() {
               placeholder="IP Address (eg: 192.168.0.1)"
               name="ip"
               onChange={handleOnChange}
+              value={values.ip}
             />
-            <Input placeholder="Level" name="level" onChange={handleOnChange} />
+            <Input
+              placeholder="Level"
+              name="level"
+              value={value.level}
+              onChange={handleOnChange}
+            />
             <Button colorScheme="blue" onClick={handleAdd}>
               Add
             </Button>
