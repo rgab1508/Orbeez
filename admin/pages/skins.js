@@ -8,37 +8,64 @@ import {
   Box,
   Flex,
   SimpleGrid,
+  useToast,
 } from "@chakra-ui/react";
+import React, { useEffect, useState } from "react";
 import Head from "next/head";
 
 export default function Skins() {
-  const skins = [
-    {
-      name: "Skin1",
-      image: "https://via.placeholder.com/200",
-      desc: "This is a skin",
-    },
-    {
-      name: "Skin1",
-      image: "https://via.placeholder.com/200",
-      desc: "This is a skin",
-    },
-    {
-      name: "Skin1",
-      image: "https://via.placeholder.com/200",
-      desc: "This is a skin",
-    },
-    {
-      name: "Skin1",
-      image: "https://via.placeholder.com/200",
-      desc: "This is a skin",
-    },
-    {
-      name: "Skin1",
-      image: "https://via.placeholder.com/200",
-      desc: "This is a skin",
-    },
-  ];
+  const [skins, setSkins] = useState([]);
+  const [values, setValues] = useState({
+    name: "",
+    desc: "",
+    file: null,
+    url: "",
+  });
+
+  const toast = useToast();
+
+  const handleOnChange = (e) => {
+    setValues((prevValues) => {
+      return {
+        ...prevValues,
+        [e.target.name]: [e.target.value],
+      };
+    });
+  };
+
+  const handleImgChange = (e) => {
+    if (!e.target.files[0]) {
+      toast({
+        title: "Please Select a Image!",
+        status: "error",
+      });
+      return;
+    }
+    setValues((prevValues) => {
+      return {
+        ...prevValues,
+        file: e.target.files[0],
+        image: URL.createObjectURL(e.target.files[0]),
+      };
+    });
+  };
+
+  const handleAdd = () => {
+    if (!values.name || !values.desc || !values.file) {
+      toast({
+        title: "Please fill all the Details!",
+        status: "error",
+      });
+      return;
+    }
+    setSkins([...skins, values]);
+    setValues({
+      name: "",
+      desc: "",
+      file: null,
+      url: "",
+    });
+  };
 
   return (
     <>
@@ -51,11 +78,27 @@ export default function Skins() {
           Add Skins
         </Text>
         <Center w="80%" gridGap="5" flexDirection="column">
-          <Input placeholder="Skin Name" />
-          <Textarea resize="none" placeholder="Skin Description" />
-          <Input type="file" placeholder="Skin Image" />
-          <Image src="https://via.placeholder.com/200" borderRadius="full" />
-          <Button>Add Skin</Button>
+          <Input
+            placeholder="Skin Name"
+            value={values.name}
+            name="name"
+            onChange={handleOnChange}
+          />
+          <Textarea
+            resize="none"
+            placeholder="Skin Description"
+            name="desc"
+            value={values.desc}
+            onChange={handleOnChange}
+          />
+          <Input
+            type="file"
+            placeholder="Skin Image"
+            name="file"
+            onChange={handleImgChange}
+          />
+          <Image src={values.image} borderRadius="full" width="200px" />
+          <Button onClick={handleAdd}>Add Skin</Button>
         </Center>
       </Center>
       {/* Skin list part */}
