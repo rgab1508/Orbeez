@@ -91,13 +91,14 @@ export default function BanList() {
         <Text fontWeight="bold" fontSize="2xl" textAlign="center">
           BAN LIST
         </Text>
-        <Flex alignItems="center" justifyContent="center">
+        <Flex alignItems="center" justifyContent="center" my={10}>
           <Flex w="60%" gridGap={5}>
             <Input
               placeholder="IP Address (eg: 192.168.0.1)"
               name="ip"
               onChange={handleOnChange}
             />
+            <Input placeholder="Level" name="level" onChange={handleOnChange} />
             <Button colorScheme="blue" onClick={handleAdd}>
               Add
             </Button>
