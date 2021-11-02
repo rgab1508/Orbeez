@@ -21,35 +21,34 @@ import Head from "next/head";
 import { useEffect, useState } from "react";
 
 export default function BanList() {
+  const [refresh, setRefresh] = useState(false);
   const [ips, setIps] = useState([]);
   const [values, setValues] = useState({
     ip: "",
-    isBanned: false,
+    isbanned: false,
     level: 0,
   });
 
   const toast = useToast();
 
   useEffect(() => {
-    const getIps = async () => {
-      fetch("/api/ips")
-        .then((res) => res.json())
-        .then((data) => setIps(data));
-    };
-
-    getIps();
-  }, []);
+    fetch("/api/ips")
+      .then((res) => res.json())
+      .then((res) => {
+        setIps(res);
+      });
+  }, [refresh]);
 
   const handleOnChange = (e) => {
     setValues((prevValues) => {
       return {
         ...prevValues,
-        [e.target.name]: [e.target.value],
+        [e.target.name]: e.target.value,
       };
     });
   };
 
-  const handleAdd = () => {
+  const handleAdd = async () => {
     if (!values.ip) {
       toast({
         title: "Please add a valid IP Address",
@@ -68,27 +67,54 @@ export default function BanList() {
       });
       return;
     }
-
-    fetch();
+    await fetch("/api/ips/add", {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        ip: values.ip,
+        isbanned: values.isbanned,
+        level: values.level,
+      }),
+    });
     setIps([...ips, values]);
     setValues({
       ip: "",
-      isBanned: false,
+      isbanned: false,
       level: 0,
     });
   };
 
-  const updateBan = (e, ip) => {
+  const updateBan = async (e, ip) => {
+    const _ip = ips.filter((i) => i.ip === ip)[0];
+    await fetch("/api/ips/edit", {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ ..._ip, isbanned: e.target.checked }),
+    });
     setIps((prevIps) => {
       return prevIps.map((i) => {
         if (i.ip != ip) return i;
-        i.isBanned = e.target.checked;
+        i.isbanned = e.target.checked;
         return i;
       });
     });
   };
 
-  const handleDelete = (ip) => {
+  const handleDelete = async (ip) => {
+    await fetch("/api/ips/delete", {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ ip }),
+    });
     setIps((prevIps) => {
       return prevIps.filter((i) => i.ip != ip);
     });
@@ -136,14 +162,14 @@ export default function BanList() {
               return (
                 <Tr
                   key={i.ip}
-                  bgColor={i.isBanned ? "red" : "white"}
-                  color={i.isBanned ? "white" : "black"}
+                  bgColor={i.isbanned ? "red" : "white"}
+                  color={i.isbanned ? "white" : "black"}
                 >
                   <Td>{i.ip}</Td>
                   <Td>{i.level}</Td>
                   <Td>
                     <Switch
-                      isChecked={i.isBanned}
+                      isChecked={i.isbanned}
                       onChange={(e) => updateBan(e, i.ip)}
                     />
                   </Td>
