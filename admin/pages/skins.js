@@ -9,18 +9,23 @@ import {
   Flex,
   SimpleGrid,
   useToast,
+  IconButton,
 } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 import Head from "next/head";
 
 export default function Skins() {
+  const sprits = ["identicon", "initials", "bottts", "jdenticon", "gridy"];
   const [skins, setSkins] = useState([]);
   const [values, setValues] = useState({
     name: "",
     desc: "",
-    file: null,
     url: "",
   });
+
+  useEffect(() => {
+    setValues({ ...values, url: getRandomSkin() });
+  }, []);
 
   const toast = useToast();
 
@@ -33,25 +38,42 @@ export default function Skins() {
     });
   };
 
-  const handleImgChange = (e) => {
-    if (!e.target.files[0]) {
-      toast({
-        title: "Please Select a Image!",
-        status: "error",
-      });
-      return;
-    }
+  // const handleImgChange = (e) => {
+  //   if (!e.target.files[0]) {
+  //     toast({
+  //       title: "Please Select a Image!",
+  //       status: "error",
+  //     });
+  //     return;
+  //   }
+  //   setValues((prevValues) => {
+  //     return {
+  //       ...prevValues,
+  //       file: e.target.files[0],
+  //       image: URL.createObjectURL(e.target.files[0]),
+  //     };
+  //   });
+  // };
+
+  const getRandomSkin = () => {
+    let seed = Math.floor(Math.random() * 1000000000000) + 1;
+    let sprit = Math.floor(Math.random() * (sprits.length - 1));
+
+    return `https://avatars.dicebear.com/api/${sprits[sprit]}/${seed}.svg`;
+  };
+
+  const handleShuffle = () => {
     setValues((prevValues) => {
       return {
         ...prevValues,
-        file: e.target.files[0],
-        image: URL.createObjectURL(e.target.files[0]),
+        url: getRandomSkin(),
       };
     });
   };
+  useEffect(() => console.log(values), [values]);
 
   const handleAdd = () => {
-    if (!values.name || !values.desc || !values.file) {
+    if (!values.name || !values.desc || !values.url) {
       toast({
         title: "Please fill all the Details!",
         status: "error",
@@ -62,8 +84,7 @@ export default function Skins() {
     setValues({
       name: "",
       desc: "",
-      file: null,
-      url: "",
+      url: getRandomSkin(),
     });
   };
 
@@ -91,13 +112,16 @@ export default function Skins() {
             value={values.desc}
             onChange={handleOnChange}
           />
-          <Input
-            type="file"
-            placeholder="Skin Image"
-            name="file"
-            onChange={handleImgChange}
-          />
-          <Image src={values.image} borderRadius="full" width="200px" />
+          <Flex w="100%">
+            <Input
+              placeholder="Skin Image"
+              name="url"
+              value={values.url}
+              onChange={handleOnChange}
+            />
+            <Button onClick={handleShuffle}>Shuffle</Button>
+          </Flex>
+          <Image src={values.url} borderRadius="full" height="200px" />
           <Button onClick={handleAdd}>Add Skin</Button>
         </Center>
       </Center>
@@ -122,7 +146,7 @@ export default function Skins() {
               bg="gray.100"
               p="10px"
             >
-              <Image src={skin.image} borderRadius="full" />
+              <Image src={skin.url} borderRadius="full" />
               <Text textAlign="center" fontSize="xl" fontWeight="bold">
                 {skin.name}
               </Text>
