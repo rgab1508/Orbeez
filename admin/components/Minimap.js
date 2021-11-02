@@ -42,7 +42,7 @@ const Minimap = (props) => {
     let w = props.isMain ? 900 : 550;
     let h = props.isMain ? 350 : 175;
     p5.createCanvas(w, h).parent(canvasParentRef);
-    p5.background(p5.color(151, 151, 151, 50));
+    p5.background(p5.color(90, 50));
     // p5.canvas.width = "100px";
     // p5.canvas.height = "100px";
     p5.push();
@@ -64,10 +64,10 @@ const Minimap = (props) => {
       p5.fill(
         p5.color(p5.random(0, 255), p5.random(0, 255), p5.random(0, 255))
       );
-
-      p5.ellipse(0, 0, p5.map(p.mass, 0, 500, 0, p5.height));
+      // p5.noStroke();
+      p5.ellipse(0, 0, p5.map(p.mass, 0, 350, 0, p5.height));
       p5.fill(0);
-      p5.text(p.name, 10, 10);
+      p5.text(`${p.name}(${p.level})`, 10, 10);
       p5.pop();
     }
   };

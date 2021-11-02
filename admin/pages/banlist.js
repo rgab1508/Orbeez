@@ -75,7 +75,7 @@ export default function BanList() {
       },
       body: JSON.stringify({
         ip: values.ip,
-        isbanned: values.isbanned,
+        isBanned: values.isbanned,
         level: values.level,
       }),
     });

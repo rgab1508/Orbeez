@@ -13,6 +13,7 @@ import {
   Tr,
   Tbody,
   Button,
+  Tooltip,
 } from "@chakra-ui/react";
 import Navbar from "../components/navbar/Navbar";
 import Sidebar from "../components/navbar/Sidebar";
@@ -24,79 +25,31 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
   const [uiState, setUiState] = useState("LIST");
   const [selectedLobby, setSelectedLobby] = useState(null);
+  const IPS = [
+    "127.0.0.1",
+    "10.0.0.1",
+    "488.123.12.111",
+    "192.168.1.1",
+    "192.168.255.255",
+    "172.16.0.0",
+    "10.255.255.255",
+  ];
 
   useEffect(() => {
-    setLobbies([
-      {
-        name: "Bruh",
-        id: "1",
-        players: [
-          {
-            id: "1",
-            name: "Abhishek",
-            mass: 50,
-            x: 0.5,
-            y: 0.2,
-          },
-          {
-            id: "2",
+    fetch("/api/lobby")
+      .then((res) => res.json())
+      .then((res) => {
+        res.map((l) => {
+          l.players.map((p) => {
+            let ipx = Math.floor(Math.random() * (IPS.length - 1));
+            p.ip = IPS[ipx];
+            return p;
+          });
+          return l;
+        });
+        setLobbies(res);
+      });
 
-            name: "Aditya",
-            mass: 60,
-            x: 0.3,
-            y: 0.7,
-          },
-          {
-            id: "3",
-
-            name: "Gregory",
-            mass: 20,
-            x: 0.5,
-            y: 0.5,
-          },
-          {
-            id: "3",
-
-            name: "Gabriel",
-            mass: 20,
-            x: 0.3,
-            y: 0.1,
-          },
-        ],
-      },
-      {
-        name: "Asia",
-        id: "2",
-        players: [
-          {
-            id: "1",
-            level: 50,
-
-            name: "Bruh 1",
-            mass: 500,
-            x: 0.5,
-            y: 0.2,
-          },
-          {
-            id: "2",
-            level: 50,
-
-            name: "Bruh 1",
-            mass: 60,
-            x: 0.3,
-            y: 0.7,
-          },
-          {
-            id: "3",
-            level: 50,
-            name: "Bruh 1",
-            mass: 20,
-            x: 0.5,
-            y: 0.5,
-          },
-        ],
-      },
-    ]);
     setIsLoading(false);
   }, []);
 
@@ -105,12 +58,44 @@ export default function Home() {
     setSelectedLobby(null);
   };
 
-  const handleBan = (pid) => {
+  const handleBan = async (p) => {
     // do ban
+
+    await fetch("/api/ips/add", {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        ip: p.ip,
+        isBanned: true,
+        level: p.level,
+      }),
+    });
+    handleKick(p);
   };
 
-  const handleKick = (pid) => {
+  const handleKick = async (p) => {
     // do kick
+    await fetch("/api/players/delete", {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        player_id: p.player_id,
+      }),
+    }).then((res) => {
+      setLobbies((prevL) =>
+        prevL.map((l) => {
+          if (l.lobby_id != p.lobby_id) return l;
+          l.players.filter((pl) => pl.player_id != p.player_id);
+          return l;
+        })
+      );
+    });
   };
 
   return (
@@ -143,7 +128,7 @@ export default function Home() {
                       my={7}
                       borderRadius="xl"
                       bgColor="red.50"
-                      key={l.id}
+                      key={l.lobby_id}
                       w="100%"
                       height="400px"
                       onClick={() => {
@@ -156,8 +141,8 @@ export default function Home() {
                       }}
                       position="relative"
                     >
-                      <Text position="absolute" top="1" right="10">
-                        #{l.id}
+                      <Text position="absolute" top="1" right="15">
+                        #{l.lobby_id}
                       </Text>
                       <Text
                         textTransform="uppercase"
@@ -236,33 +221,35 @@ export default function Home() {
                     <Tbody>
                       {selectedLobby.players.map((p) => {
                         return (
-                          <Tr
-                            key={p.id}
-                            bgColor={p.isBanned ? "red" : "white"}
-                            color={p.isBanned ? "white" : "black"}
-                          >
-                            <Td>{p.id}</Td>
-                            <Td>{p.name}</Td>
-                            <Td>{p.level}</Td>
-                            <Td>{p.mass}</Td>
+                          <Tooltip label={p.ip}>
+                            <Tr
+                              key={p.player_id}
+                              bgColor={p.isBanned ? "red" : "white"}
+                              color={p.isBanned ? "white" : "black"}
+                            >
+                              <Td>{p.player_id}</Td>
+                              <Td>{p.name}</Td>
+                              <Td>{p.level}</Td>
+                              <Td>{p.mass}</Td>
 
-                            <Td>
-                              <Button
-                                colorScheme="blue"
-                                onClick={() => handleKick(p.id)}
-                              >
-                                Kick
-                              </Button>
-                            </Td>
-                            <Td>
-                              <Button
-                                colorScheme="red"
-                                onClick={() => handleBan(p.id)}
-                              >
-                                Ban
-                              </Button>
-                            </Td>
-                          </Tr>
+                              <Td>
+                                <Button
+                                  colorScheme="blue"
+                                  onClick={() => handleKick(p)}
+                                >
+                                  Kick
+                                </Button>
+                              </Td>
+                              <Td>
+                                <Button
+                                  colorScheme="red"
+                                  onClick={() => handleBan(p)}
+                                >
+                                  Ban
+                                </Button>
+                              </Td>
+                            </Tr>
+                          </Tooltip>
                         );
                       })}
                     </Tbody>
