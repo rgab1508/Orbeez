@@ -1,25 +1,24 @@
-const { Client } = require('pg');
+const { Client } = require("pg");
 
 class DB {
   constructor() {
-  	this.client = new Client({
+    this.client = new Client({
       connectionString: process.env.DATABASE_URL,
-  	  ssl: { rejectUnauthorized: false }
-	  });
-	  this.client.connect();
+      ssl: { rejectUnauthorized: false },
+    });
+    this.client.connect();
   }
 
-  async query(query,params) {
-  	try {
-      return await this.client.query(query,params);
-    }
-    catch (e) {
+  async query(query, params) {
+    try {
+      return await this.client.query(query, params);
+    } catch (e) {
       throw new Exception(500, e.message);
     }
   }
 
   async end() {
-  	await this.client.end();
+    await this.client.end();
   }
 }
 

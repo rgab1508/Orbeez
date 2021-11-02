@@ -17,6 +17,7 @@ import {
 import Navbar from "../components/navbar/Navbar";
 import Sidebar from "../components/navbar/Sidebar";
 import { useEffect, useState } from "react";
+import Minimap from "../components/Minimap";
 
 export default function Home() {
   const [lobbies, setLobbies] = useState([]);
@@ -32,15 +33,15 @@ export default function Home() {
         players: [
           {
             id: "1",
-            name: "Bruh 1",
-            mass: 500,
+            name: "Abhishek",
+            mass: 50,
             x: 0.5,
             y: 0.2,
           },
           {
             id: "2",
 
-            name: "Bruh 1",
+            name: "Aditya",
             mass: 60,
             x: 0.3,
             y: 0.7,
@@ -48,10 +49,18 @@ export default function Home() {
           {
             id: "3",
 
-            name: "Bruh 1",
+            name: "Gregory",
             mass: 20,
             x: 0.5,
             y: 0.5,
+          },
+          {
+            id: "3",
+
+            name: "Gabriel",
+            mass: 20,
+            x: 0.3,
+            y: 0.1,
           },
         ],
       },
@@ -145,7 +154,23 @@ export default function Home() {
                         cursor: "pointer",
                         boxShadow: "0px 0px 4px 0px #ffa8a8",
                       }}
-                    ></Flex>
+                      position="relative"
+                    >
+                      <Text position="absolute" top="1" right="10">
+                        #{l.id}
+                      </Text>
+                      <Text
+                        textTransform="uppercase"
+                        position="absolute"
+                        top="1"
+                        left="7"
+                      >
+                        {l.name}
+                      </Text>
+                      <Flex flexGrow="1">
+                        <Minimap isMain lobby={l} />
+                      </Flex>
+                    </Flex>
                   );
                 })}
               </>
@@ -192,7 +217,9 @@ export default function Home() {
                       bgColor="red.50"
                       w="100%"
                       height="230px"
-                    ></Flex>
+                    >
+                      <Minimap lobby={selectedLobby} />
+                    </Flex>
                   </Flex>
 
                   <Table w="90%" mx="auto" mt={10}>

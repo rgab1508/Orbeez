@@ -18,7 +18,7 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import Head from "next/head";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function BanList() {
   const [ips, setIps] = useState([]);
@@ -29,6 +29,16 @@ export default function BanList() {
   });
 
   const toast = useToast();
+
+  useEffect(() => {
+    const getIps = async () => {
+      fetch("/api/ips")
+        .then((res) => res.json())
+        .then((data) => setIps(data));
+    };
+
+    getIps();
+  }, []);
 
   const handleOnChange = (e) => {
     setValues((prevValues) => {
@@ -58,6 +68,8 @@ export default function BanList() {
       });
       return;
     }
+
+    fetch();
     setIps([...ips, values]);
     setValues({
       ip: "",
