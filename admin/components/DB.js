@@ -14,7 +14,7 @@ class DB {
       return await this.client.query(query,params);
     }
     catch (e) {
-      throw new Exception(500, e.message);
+      console.log(e.message);
     }
   }
 
