@@ -16,15 +16,24 @@ import Head from "next/head";
 
 export default function Skins() {
   const sprits = ["identicon", "initials", "bottts", "jdenticon", "gridy"];
+  const [refresh, setRefresh] = useState(false);
   const [skins, setSkins] = useState([]);
   const [values, setValues] = useState({
     name: "",
-    desc: "",
-    url: "",
+    description: "",
+    skin_url: "",
   });
 
   useEffect(() => {
-    setValues({ ...values, url: getRandomSkin() });
+    fetch("/api/skins")
+      .then((res) => res.json())
+      .then((res) => {
+        setSkins(res);
+      });
+  }, [refresh]);
+
+  useEffect(() => {
+    setValues({ ...values, skin_url: getRandomSkin() });
   }, []);
 
   const toast = useToast();
@@ -33,7 +42,7 @@ export default function Skins() {
     setValues((prevValues) => {
       return {
         ...prevValues,
-        [e.target.name]: [e.target.value],
+        [e.target.name]: e.target.value,
       };
     });
   };
@@ -66,25 +75,35 @@ export default function Skins() {
     setValues((prevValues) => {
       return {
         ...prevValues,
-        url: getRandomSkin(),
+        skin_url: getRandomSkin(),
       };
     });
   };
   useEffect(() => console.log(values), [values]);
 
-  const handleAdd = () => {
-    if (!values.name || !values.desc || !values.url) {
+  const handleAdd = async () => {
+    if (!values.name || !values.description || !values.skin_url) {
       toast({
         title: "Please fill all the Details!",
         status: "error",
       });
       return;
     }
+
+    await fetch("/api/skins/add", {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ ...values })
+    });
+    
     setSkins([...skins, values]);
     setValues({
       name: "",
-      desc: "",
-      url: getRandomSkin(),
+      description: "",
+      skin_url: getRandomSkin(),
     });
   };
 
@@ -108,20 +127,20 @@ export default function Skins() {
           <Textarea
             resize="none"
             placeholder="Skin Description"
-            name="desc"
-            value={values.desc}
+            name="description"
+            value={values.description}
             onChange={handleOnChange}
           />
           <Flex w="100%">
             <Input
               placeholder="Skin Image"
-              name="url"
-              value={values.url}
+              name="skin_url"
+              value={values.skin_url}
               onChange={handleOnChange}
             />
             <Button onClick={handleShuffle}>Shuffle</Button>
           </Flex>
-          <Image src={values.url} borderRadius="full" height="200px" />
+          <Image src={values.skin_url} borderRadius="full" height="200px" />
           <Button onClick={handleAdd}>Add Skin</Button>
         </Center>
       </Center>
@@ -146,12 +165,12 @@ export default function Skins() {
               bg="gray.100"
               p="10px"
             >
-              <Image src={skin.url} borderRadius="full" />
+              <Image src={skin.skin_url} borderRadius="full" />
               <Text textAlign="center" fontSize="xl" fontWeight="bold">
                 {skin.name}
               </Text>
               <Text textAlign="center" fontSize="xl" fontWeight="bold">
-                {skin.desc}
+                {skin.description}
               </Text>
             </Center>
           ))}

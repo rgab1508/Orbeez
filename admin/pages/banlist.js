@@ -37,7 +37,7 @@ export default function BanList() {
       .then((res) => {
         setIps(res);
       });
-  }, [refresh])
+  }, [refresh]);
 
   const handleOnChange = (e) => {
     setValues((prevValues) => {
